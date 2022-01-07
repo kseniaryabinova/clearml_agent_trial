@@ -78,14 +78,14 @@ def test(args, model, device, test_loader, epoch):
 def main():
     # Connecting ClearML with the current process,
     # from here on everything is logged automatically
-    task = Task.init(project_name='examples', task_name='remote_execution pytorch mnist train')
+    task = Task.init(project_name='test_project', task_name='remote_execution pytorch mnist train')
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
     parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=10, metavar='N',
+    parser.add_argument('--epochs', type=int, default=2, metavar='N',
                         help='number of epochs to train (default: 10)')
     parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                         help='learning rate (default: 0.01)')
@@ -104,6 +104,7 @@ def main():
     torch.manual_seed(args.seed)
     device = torch.device("cuda" if use_cuda else "cpu")
     kwargs = {'num_workers': 4, 'pin_memory': True} if use_cuda else {}
+
     train_loader = torch.utils.data.DataLoader(
         datasets.MNIST(os.path.join('..', 'data'), train=True, download=True,
                        transform=transforms.Compose([
@@ -111,12 +112,14 @@ def main():
                            transforms.Normalize((0.1307,), (0.3081,))
                        ])),
         batch_size=args.batch_size, shuffle=True, **kwargs)
+
     test_loader = torch.utils.data.DataLoader(
         datasets.MNIST(os.path.join('..', 'data'), train=False, transform=transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))
         ])),
         batch_size=args.test_batch_size, shuffle=True, **kwargs)
+
     model = Net().to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
